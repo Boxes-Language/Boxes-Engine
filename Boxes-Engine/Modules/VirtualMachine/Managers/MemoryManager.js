@@ -31,22 +31,22 @@ export default class {
   }
 
   // Create
-  create (chunkID, name, data, readonly) {
+  create (chunkID, name, data, lock) {
     if (this.#chunks[chunkID][name] !== undefined) return { error: true, content: 'Already Exist' }
 
-    this.#chunks[chunkID][name] = { readonly, data }
+    this.#chunks[chunkID][name] = { lock, data }
 
     return { error: false }
   }
 
   // Write
-  write (chunkID, name, data) {
+  write (chunkID, name, data, force) {
     if (this.#chunks[chunkID][name] === undefined) return { error: true, content: 'Not Found' }
-    if (this.#chunks[chunkID][name].lock) return { error: true, content: 'Locked' }
+    if (this.#chunks[chunkID][name].lock && force !== true) return { error: true, content: 'Locked' }
 
     this.#size -= calculateDataSize(this.#chunks[chunkID][name].data)
 
-    this.#chunks[chunkID][name] = { readonly, data }
+    this.#chunks[chunkID][name].data = data
 
     this.#size += calculateDataSize(data)
 

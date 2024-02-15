@@ -23,7 +23,11 @@ export default class {
       currentOperation: 0
     }
 
-    this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation: 0 }, [], executable.operations[0].source, false)
+    this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation: 0 }, [
+      { name: 'Input', data: { type: 'list', value: [] }, lock: true },
+      { name: 'Result', data: { type: 'empty', value: 'Empty' }, lock: true },
+      { name: 'Local', data: { type: 'empty', value: 'Empty' }, lock: false }
+    ], executable.operations[0].source, false)
 
     return id
   }
@@ -38,9 +42,13 @@ export default class {
     this.#workspaces[id].currentOperation++
 
     if (this.#workspaces[id].currentOperation < this.#workspaces[id].operations.length) {
-      const currentOperation = this.#workspaces[id].currentWorkspace
+      const currentOperation = this.#workspaces[id].currentOperation
 
-      this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation }, [], this.#workspaces[id].operations[currentOperation].source, false)
+      this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation }, [
+        { name: 'Input', data: { type: 'list', value: [] }, lock: true },
+        { name: 'Result', data: { type: 'empty', value: 'Empty' }, lock: true },
+        { name: 'Local', data: { type: 'empty', value: 'Empty' }, lock: false }
+      ], this.#workspaces[id].operations[currentOperation].source, false)
     }
   }
 }

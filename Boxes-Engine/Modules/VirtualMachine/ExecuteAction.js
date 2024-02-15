@@ -1,37 +1,62 @@
 // Execute Action
 export default (Core, chunk, action) => {
+  let wait = false
+
   if (action.length > 1) {
 
   } else {
-    if (action[0].type === 'set') {
-      if (chunk.actionData.state === undefined) {
-        chunk.actionData = { state: 'waitingTarget', target: undefined, source: undefined }
+    if (action[0].type === 'data') {
+      if (action[0].data.type === 'list' || action[0].data.type === 'inputList') {
+        if (chunk.returnedData.length < 1) {
+          createChildChunks(Core, chunk, action[0].data.value.map((actions) => [actions]))
 
-        Core.ChunkManager.createChunk(chunk.workspaceID, { type: 'chunk', id: chunk.id }, Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Input').value, [action[0].target], false)
+          wait = true
+        } else {
+          Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', { type: action[0].data.type, value: chunk.returnedData }, true)
 
-        return { error: false }
+          chunk.returnedData = []
+        }
+      } else Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', action[0].data, true)
+    } else if (action[0].type === 'set') {
+      if (chunk.returnedData.length < 1) {
+        createChildChunks(Core, chunk, [
+          [action[0].target],
+          [action[0].source]
+        ])
+
+        wait = true
       } else {
+        const [target, source] = chunk.returnedData
 
+        if (target.address === undefined) return { error: true, content: `Cannot Assign Value To The Target (Target Is Not In A Box)`, line: action[0].line, start: action[0].start }
+
+        chunk.returnedData = []
       }
     } else if (action[0].type === 'get') {
-      let data
-      let memoryChunkID
+      let data = getBox(Core, chunk, action[0].name, [])
+      if (data.error) return { error: true, content: data.content, line: action[0].line, start: action[0].start }
 
-      data = Core.MemoryManager.read(chunk.workspaceMemoryAddress, action[0].name)
-      memoryChunkID = chunk.workspaceMemoryAddress
- 
-      if (data === undefined) {
-        data = Core.MemoryManager.read(chunk.chunkMemoryAddress, action[0].name)
-        memoryChunkID = chunk.chunkMemoryAddress
-      }
-
-      if (data === undefined) return { error: true, content: `Box Not Found: "${action[0].name}"`, line: action[0].line, start: action[0].start }
-
-      Core.MemoryManager.write(chunk.id, chunkMemoryAddress, 'Result', { type: data.type, value: data.value, address: { chunkID: memoryChunkID, name: action[0].name, path: [] }})
+      Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', data)
     }
-
   } 
-  chunk.currentAction++
 
-  return { error: false }
+  if (!wait) chunk.currentAction++
+
+  return { error: false, data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result') }
 }
+
+// Create Child Chunks
+function createChildChunks (Core, chunk, chunks) {
+  chunk.returnedData = chunks.map(() => undefined)
+
+  chunks.forEach((actions, index) => {
+    Core.ChunkManager.createChunk(chunk.workspaceID, { type: 'chunk', id: chunk.id, returnIndex: index }, [
+      { name: 'Input', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Input'), lock: true },
+      { name: 'Result', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result'), lock: true },
+      { name: 'Local', data: { type: 'link', address: { chunkID: chunk.chunkMemoryAddress, name: 'Local', path: [] }}, lock: false }
+    ], actions, false)
+  })
+}
+
+import setBox from './SetBox.js'
+import getBox from './GetBox.js'

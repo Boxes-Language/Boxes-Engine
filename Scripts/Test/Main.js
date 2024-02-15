@@ -3,13 +3,15 @@
 import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 
 const executable = (await new Compiler()
-  .compile(`+a <- 1`)).data
+  .compile(`+@a <- a[1]`)).data
+
+console.log(JSON.stringify(executable, null, 2))
 
 // Execute
 async function execute () {
-  const vm = new VirtualMachine({ executionInterval: 500 })
+  const vm = new VirtualMachine()
   
-  console.log(await vm.start(executable))
+  console.log('Finished', await vm.start(executable))
 }
 
-execute()
+// execute()

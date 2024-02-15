@@ -29,6 +29,6 @@ export default class {
 
     this.#index++
 
-    return (this.#Core.ChunkManager.getChunk(task).state === 'running') ? task : next()
+    return (this.#Core.ChunkManager.getChunk(task).state === 'running') ? task : this.next()
   }
 }

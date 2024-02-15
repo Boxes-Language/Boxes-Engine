@@ -106,7 +106,7 @@ export default async (Compiler, string) => {
 
           addFragment({ type: 'number', value: state.value, line: state.line, start: state.start, end: i-1 })
 
-          return -1
+          return 0
         }
       } else if (state.type === 'string') {
         if (string[i] === state.closeType) addFragment({ type: 'string', value: state.value, line: state.line, start: state.start, end: i-1 })
@@ -115,7 +115,7 @@ export default async (Compiler, string) => {
         if (string[i] === "'" || string[i] === '"' || operators.includes(string[i])) {
           addFragment({ type: 'name', value: state.value, line: state.line, start: state.start, end: i-- })
 
-          return -1
+          return 0
         } else state.value+=string[i]
       }
     }
@@ -128,11 +128,11 @@ export default async (Compiler, string) => {
     else addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: string.length-1 })
   }
 
-  await lazyLoop(operations.length, Compiler.options.loopInterval, (i) => {
+  await lazyLoop(operations.length, Compiler.options.loopInterval, async (i) => {
     if (operations[i].length > 0) {
       const fragments = operations[i].map((fragment) => (checkFragment(fragment, { type: ['name'], value: keywords })) ? { type: 'keyword', value: fragment.value, line: fragment.line, start: fragment.start, end: fragment.end } : fragment)
 
-      const fragments2 = parseList(fragments)
+      const fragments2 = await parseList(Compiler, fragments)
 
       if (fragments2.error) errors = errors.concat(fragments2.errors)
       else operations[i] = fragments2.data
@@ -149,36 +149,38 @@ export default async (Compiler, string) => {
 }
 
 // Parse List
-function parseList (fragments) {
+async function parseList (Compiler, fragments) {
   const fragments2 = []
   const errors = []
 
   let state = {}
 
-  for (let i = 0; i < fragments.length; i++) {
+  await lazyLoop(fragments.length, Compiler.options.loopInterval, async (i) => {
     if (state.type === undefined) {
-      if (checkFragment(fragments[i], { type: ['bracket'], value: ['[', '{', '('] })) state = { type: ['list', 'instructionList', 'inputList']['[{('.indexOf(fragments[i].value)], value: [[]], line: fragments[i].line, layer: fragments[i].layer, start: fragments[i].start }
+      if (checkFragment(fragments[i], { type: ['bracket'], value: ['[', '{', '('] })) state = { type: ['list', 'actionList', 'inputList']['[{('.indexOf(fragments[i].value)], value: [[]], line: fragments[i].line, layer: fragments[i].layer, start: fragments[i].start }
       else fragments2.push(fragments[i])
     } else {
-      if (checkFragment(fragments[i], { type: ['bracket'], value: [']})'[['list', 'instructionList', 'inputList'].indexOf(state.type)]], layer: state.layer })) {
-        state.value.forEach((fragments3, index) => {
-          let fragments4 = parseList(fragments3)
+      if (checkFragment(fragments[i], { type: ['bracket'], value: [']})'[['list', 'actionList', 'inputList'].indexOf(state.type)]], layer: state.layer })) {
+        for (let i = 0; i < state.value.length; i++) {
+          let fragments4 = await parseList(Compiler, state.value[i])
           if (fragments4.error) errors = errors.concat(fragments4.errors)
 
-          state.value[index] = fragments4.data
-        })
+          state.value[i] = fragments4.data
+        }
 
         fragments2.push({ type: state.type, value: state.value, line: state.line, start: state.start, end: fragments[i].end })
 
         state = {}
       } else {
-        if (checkFragment(fragments[i], { type: ['operator'], value: [(state.type === 'instructionList') ? '|' : ','], layer: state.layer+1 })) {
+        if (checkFragment(fragments[i], { type: ['operator'], value: [(state.type === 'actionList') ? '|' : ','], layer: state.layer+1 })) {
           if (state.value[state.value.length-1].length > 0) state.value.push([])
           else errors.push({ content: `Unexpected "${fragments[i].value}" <operator>`, line: fragments[i].line, start: fragments[i].start })
         } else state.value[state.value.length-1].push(fragments[i])
       }
     }
-  }
+
+    return 1
+  })
 
   return { error: errors.length > 0, errors, data: fragments2 }
 }

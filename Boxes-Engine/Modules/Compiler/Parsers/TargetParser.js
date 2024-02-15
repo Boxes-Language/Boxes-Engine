@@ -14,7 +14,7 @@ export default (fragments) => {
     } else skip = 1
   }
 
-  if (checkFragment(fragments[skip], { type: ['name'] })) return { error: false, data: { name: fragments[0].value, flags }}
+  if (checkFragment(fragments[skip], { type: ['name'] })) return { error: false, data: { name: fragments[skip].value, flags }}
   else if (fragments[skip] === undefined) return { error: true, content: 'Expecting A <name>', line: fragments[fragments.length-1].line, start: fragments[fragments.length-1].end }
   else return { error: true, content: `Unexpected "${fragments[skip].value}" <${fragments[skip].type}> (Expecting A <name>)`, line: fragments[skip].line, start: fragments[skip].start }
 }

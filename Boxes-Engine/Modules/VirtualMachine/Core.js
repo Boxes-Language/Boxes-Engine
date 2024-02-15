@@ -4,6 +4,8 @@ export default class {
   #callback
   #executable
 
+  #result
+
   constructor (options, callback, executable, location) {
     this.#options = options
     this.#callback = callback
@@ -28,8 +30,12 @@ export default class {
           this.TimerManager.deleteTimer(timer)
 
           this.#callback(result)
-        }
-      } else this.#callback()
+        } else this.#result = result.data
+      } else {
+        this.TimerManager.deleteTimer(timer)
+
+        this.#callback({ error: false, data: this.#result })
+      }
     })
   }
 

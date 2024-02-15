@@ -11,8 +11,8 @@ export default class {
   get totalChunks () {return Object.keys(this.#chunks).length}
 
   // Create Chunk
-  createChunk (workspaceID, parent, input, actions, async, callLocation) {
-    const id = generateID(10, Object.keys(this.#chunks))
+  createChunk (workspaceID, parent, localBoxes, actions, async, callLocation) {
+    const id = generateAddress(this.#Core.options.addressLength, Object.keys(this.#chunks))
 
     let callPath = []
 
@@ -48,9 +48,9 @@ export default class {
       callPath
     }
 
-    this.#Core.MemoryManager.write(this.#chunks[id].chunkMemoryAddress, 'Input', { type: 'list', value: input }, true)
-    this.#Core.MemoryManager.write(this.#chunks[id].chunkMemoryAddress, 'Result', { type: 'none', value: 'none' }, true)
-    this.#Core.MemoryManager.write(this.#chunks[id].chunkMemoryAddress, 'Local', { type: 'none', value: 'none' }, false)
+    localBoxes.forEach((box) => {
+      this.#Core.MemoryManager.create(this.#chunks[id].chunkMemoryAddress, box.name, box.data, box.lock)
+    })
 
     return id
   }
@@ -80,7 +80,11 @@ export default class {
 
         this.#Core.WorkspaceManager.continueWorkspace(chunk.workspaceID)
       } else if (chunk.parent.type === 'chunk') {
-        const chunk = this.#chunks[chunk.parent.id]
+        const parentChunk = this.#chunks[chunk.parent.id]
+
+        parentChunk.returnedData[chunk.parent.returnIndex] = this.#Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result')
+
+        if (parentChunk.returnedData.filter((data) => data === undefined).length < 1) parentChunk.state = 'running'
       }
     }
 
@@ -100,19 +104,17 @@ export default class {
   executeChunk (id) {
     const chunk = this.#chunks[id]
 
-    console.log(id)
-
     const result = executeAction(this.#Core, chunk, chunk.actions[chunk.currentAction])
 
     if (chunk.currentAction >= chunk.actions.length) {
-      return this.deleteChunk(id)
+      const result = this.deleteChunk(id)
+      if (result.error) return result
     }
 
     return result
   }
 }
 
-import generateID from '../../Tools/GenerateID.js'
+import generateAddress from '../../Tools/GenerateAddress.js'
 
 import executeAction from '../ExecuteAction.js'
-import setBox from '../SetBox.js'

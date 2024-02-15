@@ -27,7 +27,7 @@ function parseInstruction (fragments) {
         chunks[index] = instructions2.data
       }
 
-      instructions = [{ type: 'set', target: chunks[0], source: chunks[1] }]
+      instructions = [{ type: 'set', target: chunks[0], source: chunks[1], line: operator.line, start: operator.start }]
     } else if (fragments.filter((fragment) => fragment.type === 'operator' && fragment.value === '!').length > 0) {
       for (let [index, fragment] of fragments.filter((fragment) => fragment.type === 'operator' && fragment.value === '!').entries()) {
         if (index > 0) return { error: true, content: `Unexpected "!" <operator>`, line: fragment.line, start: fragment.start }
@@ -42,7 +42,7 @@ function parseInstruction (fragments) {
       const instructions2 = parseInstruction(fragments.slice(1, fragments.length))
       if (instructions2.error) return instructions2
 
-      instructions =  [{ type: 'math', operation: 'not', data: [instructions2] }]
+      instructions =  [{ type: 'math', operation: 'not', data: [instructions2], line: fragments[0].line, start: fragments[0].start }]
     } else if (fragments.filter((fragment) => fragment.type === 'operator' && expressionOperators.includes(fragment.value)).length > 0) {
       let operator
 
@@ -62,9 +62,9 @@ function parseInstruction (fragments) {
         chunks[index] = instructions2.data
       }
 
-      instructions = [{ type: 'math', operation: ['add', 'subtract', 'multiply', 'divide', 'equal', 'greater', 'greaterEqual', 'less', 'lessEqual', 'and', 'or'][expressionOperators.indexOf(operator.value)], data: [chunks[0], chunks[1]] }]
+      instructions = [{ type: 'math', operation: ['add', 'subtract', 'multiply', 'divide', 'equal', 'greater', 'greaterEqual', 'less', 'lessEqual', 'and', 'or'][expressionOperators.indexOf(operator.value)], data: [chunks[0], chunks[1]], line: operator.line, start: operator.start }]
     } else if (fragments[0].type === 'list' || fragments[0].type === 'inputList') {
-      const instructions2 = parseInstruction([fragments[0]])
+       const instructions2 = parseInstruction([fragments[0]])
       if (instructions2.error) return instructions2
 
       instructions.push({ type: (fragments[1].type === 'list') ? 'read' : 'call', parameters: instructions2.data[0].data.value })
@@ -101,7 +101,7 @@ function parseInstruction (fragments) {
       instructions = instructions.concat(instructions2.data)
     } else return { error: true, content: `Unexpected "${fragments[1].value}" <${fragments[1].type}>`, line: fragments[1].line, start: fragments[1].start }
   } else {
-    if (['list', 'instructionList', 'inputList'].includes(fragments[0].type)) {
+    if (['list', 'actionList', 'inputList'].includes(fragments[0].type)) {
       if (fragments[0].type === 'inputList' && fragments[0].value.length < 2) {
         const instructions2 = parseInstruction(fragments[0].value[0])
         if (instructions2.error) return instructions2
