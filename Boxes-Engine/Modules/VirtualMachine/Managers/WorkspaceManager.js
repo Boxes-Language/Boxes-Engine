@@ -23,7 +23,7 @@ export default class {
       currentOperation: 0
     }
 
-    this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation: 0 }, [
+    this.#Core.ChunkManager.createChunk('chunk', id, { type: 'workspace', id, currentOperation: 0 }, [
       { name: 'Input', data: { type: 'list', value: [] }, lock: true },
       { name: 'Result', data: { type: 'empty', value: 'Empty' }, lock: true },
       { name: 'Local', data: { type: 'empty', value: 'Empty' }, lock: false }
@@ -44,7 +44,7 @@ export default class {
     if (this.#workspaces[id].currentOperation < this.#workspaces[id].operations.length) {
       const currentOperation = this.#workspaces[id].currentOperation
 
-      this.#Core.ChunkManager.createChunk(id, { type: 'workspace', id, currentOperation }, [
+      this.#Core.ChunkManager.createChunk('chunk', id, { type: 'workspace', id, currentOperation }, [
         { name: 'Input', data: { type: 'list', value: [] }, lock: true },
         { name: 'Result', data: { type: 'empty', value: 'Empty' }, lock: true },
         { name: 'Local', data: { type: 'empty', value: 'Empty' }, lock: false }

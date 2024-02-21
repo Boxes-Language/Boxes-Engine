@@ -57,12 +57,38 @@ export default class {
   read (chunkID, name) {
     return (this.#chunks[chunkID][name] === undefined) ? undefined : this.#chunks[chunkID][name].data
   }
+
+  // Get Box
+  getBox (Core, chunk, name, path) {
+    let data
+    let memoryChunkID
+
+    data = Core.MemoryManager.read(chunk.workspaceMemoryAddress, name)
+    memoryChunkID = chunk.workspaceMemoryAddress
+ 
+    if (data === undefined) {
+      data = Core.MemoryManager.read(chunk.chunkMemoryAddress, name)
+      memoryChunkID = chunk.chunkMemoryAddress
+    }
+
+    if (data === undefined) return { error: true, content: `Box Not Found: "${name}"` }
+
+    if (path.length > 0) {
+      for (let key of path) {
+        if (data.type === 'list') data = data.value[key]
+        else if (data === undefined) return { error: true, content: `Cannot Read ${key} from <none>` }
+        else return { error: true, content: `Cannot Read ${key} from <${data.type}>` }
+      }
+    }
+
+    return { error: false, data: { type: data.type, value: data.value, address: { chunkID: memoryChunkID, name, path: [] }}}
+  }
 }
 
 // Calculate Data Size
 function calculateDataSize (data) {
   if (data.type === 'boolean') return 4
-  else if (data.type === 'number') return 8
+  else if (data.type === 'number' || data.type === 'link') return 8
   else if (data.type === 'string') return data.value.length*2
   else if (data.type === 'empty') return 1
   else if (data.type === 'list') {

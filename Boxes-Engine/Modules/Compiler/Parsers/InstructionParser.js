@@ -9,7 +9,12 @@ function parseInstruction (fragments) {
   let instructions = []
 
   if (fragments.length > 1) {
-    if (fragments.filter((fragment) => fragment.type === 'operator' && fragment.value === '=').length > 0) {
+    if (fragments[0].type === 'operator' && fragments[0].value === '~') {
+      const instructions2 = parseInstruction(fragments.slice(1, fragments.length))
+      if (instructions2.error) return instructions2
+
+      instructions = [{ type: 'data', data: { type: 'link', value: [instructions2.data] }, line: fragments[0].line, start: fragments[0].start }]
+    } else if (fragments.filter((fragment) => fragment.type === 'operator' && fragment.value === '=').length > 0) {
       for (let [index, fragment] of fragments.filter((fragment) => fragment.type === 'operator' && fragment.value === '=').entries()) {
         if (index > 0) return { error: true, content: `Unexpected "=" <operator>`, line: fragment.line, start: fragment.start }
       }
@@ -67,7 +72,7 @@ function parseInstruction (fragments) {
        const instructions2 = parseInstruction([fragments[0]])
       if (instructions2.error) return instructions2
 
-      instructions.push({ type: (fragments[1].type === 'list') ? 'read' : 'call', parameters: instructions2.data[0].data.value })
+      instructions.push({ type: (fragments[1].type === 'list') ? 'read' : 'call', keys: instructions2.data[0].data.value, line: fragments[0].line, start: fragments[0].start })
 
       if (fragments.slice(1, fragments.length).length > 0) {
         const instructions3 = parseInstruction(fragments.slice(1, fragments.length))
@@ -84,7 +89,7 @@ function parseInstruction (fragments) {
       const instructions3 = parseInstruction([fragments[1]])
       if (instructions3.error) return instructions3
 
-      instructions.push({ type: (fragments[1].type === 'list') ? 'read' : 'call', key: instructions3.data[0].data.value })
+      instructions.push({ type: (fragments[1].type === 'list') ? 'read' : 'call', keys: instructions3.data[0].data.value, line: fragments[1].line, start: fragments[1].start })
 
       if (fragments.slice(2, fragments.length).length > 0) {
         const instructions4 = parseInstruction(fragments.slice(2, fragments.length))
@@ -102,7 +107,7 @@ function parseInstruction (fragments) {
     } else return { error: true, content: `Unexpected "${fragments[1].value}" <${fragments[1].type}>`, line: fragments[1].line, start: fragments[1].start }
   } else {
     if (['list', 'actionList', 'inputList'].includes(fragments[0].type)) {
-      if (fragments[0].type === 'inputList' && fragments[0].value.length < 2) {
+      if (fragments[0].type === 'inputList' && fragments[0].value.length === 1) {
         const instructions2 = parseInstruction(fragments[0].value[0])
         if (instructions2.error) return instructions2
 
@@ -119,7 +124,11 @@ function parseInstruction (fragments) {
 
         instructions = [{ type: 'data', data: { type: fragments[0].type, value: items }, line: fragments[0].line, start: fragments[0].start }]
       }
-    } else if (fragments[0].type === 'keyword') return { error: true, content: `Unexpected "${fragments[0].value}" <${fragments[0].type}>`, line: fragments[0].line, start: fragments[0].start }
+    } else if (fragments[0].type === 'keyword' && fragments[0].value === 'stop') {
+      if (fragments.length > 1) return { error: true, content: `Unexpected "${fragments[1].value}" <${fragments[1].type}>`, line: fragments[1].line, start: fragments[1].start }
+
+      instructions = [{ type: 'stop' }]
+    } else if (fragments[0].type === 'keyword' || fragments[0].type === 'operator') return { error: true, content: `Unexpected "${fragments[0].value}" <${fragments[0].type}>`, line: fragments[0].line, start: fragments[0].start }
     else if (fragments[0].type === 'name') instructions = [{ type: 'get', name: fragments[0].value, line: fragments[0].line, start: fragments[0].start }]
     else instructions = [{ type: 'data', data: { type: fragments[0].type, value: fragments[0].value }, line: fragments[0].line, start: fragments[0].start }]
   }

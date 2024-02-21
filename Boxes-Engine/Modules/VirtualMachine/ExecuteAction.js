@@ -2,61 +2,42 @@
 export default (Core, chunk, action) => {
   let wait = false
 
-  if (action.length > 1) {
+  const instruction = action[chunk.actionData.index]
 
-  } else {
-    if (action[0].type === 'data') {
-      if (action[0].data.type === 'list' || action[0].data.type === 'inputList') {
-        if (chunk.returnedData.length < 1) {
-          createChildChunks(Core, chunk, action[0].data.value.map((actions) => [actions]))
+  if (instruction.type === 'data') {
+    const result = instruction_data(Core, chunk, instruction)
 
-          wait = true
-        } else {
-          Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', { type: action[0].data.type, value: chunk.returnedData }, true)
+    if (typeof result === 'object') return result
 
-          chunk.returnedData = []
-        }
-      } else Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', action[0].data, true)
-    } else if (action[0].type === 'set') {
-      if (chunk.returnedData.length < 1) {
-        createChildChunks(Core, chunk, [
-          [action[0].target],
-          [action[0].source]
-        ])
+    wait = result === true
+  } else if (instruction.type === 'get') {
+    const result = instruction_get(Core, chunk, instruction)
 
-        wait = true
-      } else {
-        const [target, source] = chunk.returnedData
+    if (typeof result === 'object') return result
+  } else if (instruction.type === 'read') {
+    const result = instruction_read(Core, chunk, instruction)
 
-        if (target.address === undefined) return { error: true, content: `Cannot Assign Value To The Target (Target Is Not In A Box)`, line: action[0].line, start: action[0].start }
+    if (typeof result === 'object') return result
 
-        chunk.returnedData = []
-      }
-    } else if (action[0].type === 'get') {
-      let data = getBox(Core, chunk, action[0].name, [])
-      if (data.error) return { error: true, content: data.content, line: action[0].line, start: action[0].start }
+    wait = result === true
+  } else if (instruction.type === 'set') {
+    const result = instruction_set(Core, chunk, instruction)
 
-      Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', data)
-    }
-  } 
+    if (typeof result === 'object') return result
 
-  if (!wait) chunk.currentAction++
+    wait = result === true
+  }
+
+  if (!wait) {
+    if (chunk.actionData.index < action.length-1) {
+      chunk.actionData.index++
+    } else chunk.currentAction++
+  }
 
   return { error: false, data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result') }
 }
 
-// Create Child Chunks
-function createChildChunks (Core, chunk, chunks) {
-  chunk.returnedData = chunks.map(() => undefined)
-
-  chunks.forEach((actions, index) => {
-    Core.ChunkManager.createChunk(chunk.workspaceID, { type: 'chunk', id: chunk.id, returnIndex: index }, [
-      { name: 'Input', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Input'), lock: true },
-      { name: 'Result', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result'), lock: true },
-      { name: 'Local', data: { type: 'link', address: { chunkID: chunk.chunkMemoryAddress, name: 'Local', path: [] }}, lock: false }
-    ], actions, false)
-  })
-}
-
-import setBox from './SetBox.js'
-import getBox from './GetBox.js'
+import { instruction_read } from './Instructions/Read.js'
+import { instruction_get } from './Instructions/Get.js'
+import { instruction_set } from './Instructions/Set.js'
+import instruction_data from './Instructions/Data.js'

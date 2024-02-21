@@ -34,7 +34,7 @@ export default async (Compiler, string) => {
 
         let skip = 0
 
-        while (string[i] === '\n' || string[i] === undefined) skip++
+        while (string[i+skip] !== '\n' && string[i+skip] !== undefined) skip++
 
         return skip
       }
@@ -129,7 +129,8 @@ export default async (Compiler, string) => {
   }
 
   await lazyLoop(operations.length, Compiler.options.loopInterval, async (i) => {
-    if (operations[i].length > 0) {
+    if (operations[i] === undefined) return 1
+    else if (operations[i].length > 0) {
       const fragments = operations[i].map((fragment) => (checkFragment(fragment, { type: ['name'], value: keywords })) ? { type: 'keyword', value: fragment.value, line: fragment.line, start: fragment.start, end: fragment.end } : fragment)
 
       const fragments2 = await parseList(Compiler, fragments)
@@ -161,11 +162,13 @@ async function parseList (Compiler, fragments) {
       else fragments2.push(fragments[i])
     } else {
       if (checkFragment(fragments[i], { type: ['bracket'], value: [']})'[['list', 'actionList', 'inputList'].indexOf(state.type)]], layer: state.layer })) {
-        for (let i = 0; i < state.value.length; i++) {
-          let fragments4 = await parseList(Compiler, state.value[i])
-          if (fragments4.error) errors = errors.concat(fragments4.errors)
+        if (state.value[0].length < 1) state.value = []
 
-          state.value[i] = fragments4.data
+        for (let i = 0; i < state.value.length; i++) {
+          const fragments3 = await parseList(Compiler, state.value[i])
+          if (fragments3.error) errors = errors.concat(fragments3.errors)
+
+          state.value[i] = fragments3.data
         }
 
         fragments2.push({ type: state.type, value: state.value, line: state.line, start: state.start, end: fragments[i].end })
@@ -190,4 +193,4 @@ import lazyLoop from '../../Tools/LazyLoop.js'
 import checkFragment from '../CheckFragment.js'
 
 const operators = ['@', '!', '?', ':', '<-', '->', '+', '-', '*', '/', '=', '==', '>', '>=', '<', '<=', '&&', '||', ',', '|', '~']
-const keywords = ['async', 'import', 'as']
+const keywords = ['import', 'as', 'async', 'return']

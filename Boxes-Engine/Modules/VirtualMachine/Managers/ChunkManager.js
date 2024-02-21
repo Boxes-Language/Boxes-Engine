@@ -11,7 +11,7 @@ export default class {
   get totalChunks () {return Object.keys(this.#chunks).length}
 
   // Create Chunk
-  createChunk (workspaceID, parent, localBoxes, actions, async, callLocation) {
+  createChunk (type, workspaceID, parent, localBoxes, actions, async, callLocation) {
     const id = generateAddress(this.#Core.options.addressLength, Object.keys(this.#chunks))
 
     let callPath = []
@@ -30,6 +30,7 @@ export default class {
 
     this.#chunks[id] = {
       id,
+      type,
       state: 'running',
 
       async,
@@ -42,7 +43,9 @@ export default class {
       actions,
 
       currentAction: 0,
-      actionData: {},
+      actionData: {
+        index: 0
+      },
       returnedData: [],
 
       callPath
@@ -53,6 +56,19 @@ export default class {
     })
 
     return id
+  }
+
+  // Create Child Chunks
+  createChildChunks (Core, chunk, chunks) {
+    chunk.returnedData = chunks.map(() => undefined)
+
+    chunks.forEach((actions, index) => {
+      this.createChunk('childChunk', chunk.workspaceID, { type: 'chunk', id: chunk.id, returnIndex: index }, [
+        { name: 'Input', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Input'), lock: true },
+        { name: 'Result', data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result'), lock: true },
+        { name: 'Local', data: { type: 'link', address: { chunkID: chunk.chunkMemoryAddress, name: 'Local', path: [] }}, lock: false }
+      ], actions, false)
+    })
   }
 
   // Delete Chunk
