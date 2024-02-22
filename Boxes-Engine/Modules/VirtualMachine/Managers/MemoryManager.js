@@ -39,6 +39,13 @@ export default class {
     return { error: false }
   }
 
+  // Delete
+  delete (chunkID, name) {
+    this.#size -= calculateDataSize(this.#chunks[chunkID][name].data)
+
+    delete this.#chunks[chunkID][name]
+  }
+
   // Write
   write (chunkID, name, data, force) {
     if (this.#chunks[chunkID][name] === undefined) return { error: true, content: 'Not Found' }

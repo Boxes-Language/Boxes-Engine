@@ -2,7 +2,7 @@
 export default (Core, chunk, action) => {
   let wait = false
 
-  const instruction = action[chunk.actionData.index]
+  const instruction = action[chunk.actionData.currentIndex]
 
   if (instruction.type === 'data') {
     const result = instruction_data(Core, chunk, instruction)
@@ -10,18 +10,31 @@ export default (Core, chunk, action) => {
     if (typeof result === 'object') return result
 
     wait = result === true
-  } else if (instruction.type === 'get') {
+  } else if (instruction.type === 'method') chunk.actionData.methods.push(instruction.name)
+  else if (instruction.type === 'get') {
     const result = instruction_get(Core, chunk, instruction)
 
     if (typeof result === 'object') return result
+  } else if (instruction.type === 'set') {
+    const result = instruction_set(Core, chunk, instruction)
+
+    if (typeof result === 'object') return result
+
+    wait = result === true
   } else if (instruction.type === 'read') {
     const result = instruction_read(Core, chunk, instruction)
 
     if (typeof result === 'object') return result
 
     wait = result === true
-  } else if (instruction.type === 'set') {
-    const result = instruction_set(Core, chunk, instruction)
+  } else if (instruction.type === 'call') {
+    const result = instruction_call(Core, chunk, instruction)
+
+    if (typeof result === 'object') return result
+
+    wait = result === true
+  } else if (instruction.type === 'math') {
+    const result = instruction_math(Core, chunk, instruction)
 
     if (typeof result === 'object') return result
 
@@ -29,9 +42,14 @@ export default (Core, chunk, action) => {
   }
 
   if (!wait) {
-    if (chunk.actionData.index < action.length-1) {
-      chunk.actionData.index++
-    } else chunk.currentAction++
+    if (chunk.actionData.currentIndex < action.length-1) {
+      chunk.actionData.currentIndex++
+    } else {
+      chunk.currentAction++
+
+      chunk.actionData.currentIndex = 0
+      chunk.actionData.methods = []
+    }
   }
 
   return { error: false, data: Core.MemoryManager.read(chunk.chunkMemoryAddress, 'Result') }
@@ -40,4 +58,6 @@ export default (Core, chunk, action) => {
 import { instruction_read } from './Instructions/Read.js'
 import { instruction_get } from './Instructions/Get.js'
 import { instruction_set } from './Instructions/Set.js'
+import instruction_call from './Instructions/Call.js'
 import instruction_data from './Instructions/Data.js'
+import instruction_math from './Instructions/Math.js'

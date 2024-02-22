@@ -31,8 +31,8 @@ function read (data, path) {
           data.value = data.value[key].value
         }
       }
-    } else if (data === undefined) return { error: true, content: `Cannot Read ${key} from <none>` }
-    else return { error: true, content: `Cannot Read ${key} from <${data.type}>` }
+    } else if (data === undefined) return { error: true, content: 'Cannot Perform "Read" Operation On <none>' }
+    else return { error: true, content: `Cannot Perform "Read" Operation On <${data.type}>` }
   }
 
   return { error: false, data }

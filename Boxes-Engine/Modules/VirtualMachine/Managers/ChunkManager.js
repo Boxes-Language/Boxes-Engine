@@ -19,7 +19,7 @@ export default class {
     if (parent.type === 'chunk') {
       const chunk = this.getChunk(parent.id)
 
-      callPath = chunk.callPath.concat([callLocation])
+      callPath = (callLocation === undefined) ? chunk.callPath : chunk.callPath.concat([callLocation])
 
       if (callPath.length > 10) callPath.splice(0, 1)
 
@@ -44,7 +44,8 @@ export default class {
 
       currentAction: 0,
       actionData: {
-        index: 0
+        currentIndex: 0,
+        methods: []
       },
       returnedData: [],
 

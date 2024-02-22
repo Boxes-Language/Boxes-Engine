@@ -70,14 +70,14 @@ export default async (Compiler, string) => {
 
         let value
 
-        if (checkFragment(operation[operation.length-1], { type: ['operator'], value: ['-'] })) {
+        if (operation[operation.length-2] !== undefined && checkFragment(operation[operation.length-1], { type: ['operator'], value: ['-'] })) {
           operation.splice(operation.length-1, 1)
 
           value = `-${string[i]}`
         } else value = string[i]
 
         state = { type: 'number', value, line, start }
-      } else if (string[i] === "'" || string[i] === "'") state = { type: 'string', closeType: string[i], value: '', line, start }
+      } else if (string[i] === "'" || string[i] === '"') state = { type: 'string', closeType: string[i], value: '', line, start }
       else if (string.substring(i, i+5) === 'Empty') {
         addFragment({ type: 'empty', value: 'Empty', line, start, end: i+4 })
 

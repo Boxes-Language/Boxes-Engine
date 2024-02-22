@@ -7,10 +7,17 @@ function set (Core, address, data) {
   if (address.path.length > 0) {
     for (let i = 0; i < address.path.length - 1; i++) target = target.value[address.path[i]]
 
-    target.value[address.path[address.path.length-1]] = data
+    if (data.type === 'fire') target.value.splice(address.path[address.path.length-1], 1)
+    else target.value[address.path[address.path.length-1]] = data
+
+    return Core.MemoryManager.write(address.chunkID, address.name, target)
   }
 
-  return Core.MemoryManager.write(address.chunkID, address.name, target)
+  if (data.type === 'fire') {
+    Core.MemoryManager.delete(address.chunkID, address.name)
+
+    return { error: false }
+  } else return Core.MemoryManager.write(address.chunkID, address.name, target)
 }
 
 // Set Instruction

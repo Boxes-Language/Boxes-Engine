@@ -98,7 +98,7 @@ function parseInstruction (fragments) {
         instructions = instructions.concat(instructions4.data)
       }
     } else if (fragments[0].type === 'keyword' && fragments[0].value === 'async') {
-      instructions.push({ type: 'method', key: 'async' })
+      instructions.push({ type: 'method', name: 'async' })
 
       const instructions2 = parseInstruction(fragments.slice(1, fragments.length))
       if (instructions2.error) return instructions2
@@ -107,23 +107,16 @@ function parseInstruction (fragments) {
     } else return { error: true, content: `Unexpected "${fragments[1].value}" <${fragments[1].type}>`, line: fragments[1].line, start: fragments[1].start }
   } else {
     if (['list', 'actionList', 'inputList'].includes(fragments[0].type)) {
-      if (fragments[0].type === 'inputList' && fragments[0].value.length === 1) {
-        const instructions2 = parseInstruction(fragments[0].value[0])
+      let items = []
+
+      for (let fragments2 of fragments[0].value) {
+        const instructions2 = parseInstruction(fragments2)
         if (instructions2.error) return instructions2
 
-        instructions = instructions2.data
-      } else {
-        let items = []
-
-        for (let fragments2 of fragments[0].value) {
-          const instructions2 = parseInstruction(fragments2)
-          if (instructions2.error) return instructions2
-
-          items.push(instructions2.data)
-        }
-
-        instructions = [{ type: 'data', data: { type: fragments[0].type, value: items }, line: fragments[0].line, start: fragments[0].start }]
+        items.push(instructions2.data)
       }
+
+      instructions = [{ type: 'data', data: { type: fragments[0].type, value: items }, line: fragments[0].line, start: fragments[0].start }]
     } else if (fragments[0].type === 'keyword' && fragments[0].value === 'stop') {
       if (fragments.length > 1) return { error: true, content: `Unexpected "${fragments[1].value}" <${fragments[1].type}>`, line: fragments[1].line, start: fragments[1].start }
 

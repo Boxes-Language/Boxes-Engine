@@ -25,7 +25,7 @@ function get (Core, chunk, name, path) {
 
   if (data.type === 'link') return get(Core, chunk, data.value.name, data.value.path)
 
-  return { error: false, data: { type: data.type, value: data.value, address: { chunkID: memoryChunkID, name, path: [] }}}
+  return { error: false, data: { type: data.type, value: data.value, address: { chunkID: memoryChunkID, name, path }}}
 }
 
 // Get Instruction
