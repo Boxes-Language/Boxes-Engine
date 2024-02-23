@@ -66,6 +66,8 @@ function instruction_read (Core, chunk, instruction) {
     result = read(result, path)
     if (result.error) return result
 
+    console.log(result.data)
+
     Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', result.data, true)
 
     chunk.returnedData = []

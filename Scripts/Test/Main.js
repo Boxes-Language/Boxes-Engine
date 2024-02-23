@@ -5,13 +5,11 @@ import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 const executable = (await new Compiler()
   .compile(
 `
-# +@getNumber <- { 1 }
++@functions <- [{ 1 }, { 2 }]
 
-+@main <- 1 == 1
++@main <- functions[0]()
 `
   ))
-
-console.log(executable)
 
 // Execute
 async function execute () {
