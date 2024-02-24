@@ -3,7 +3,8 @@ export { read, instruction_read }
 // Read
 function read (data, path) {
   for (let key of path) {
-    if (data.type === 'string' || data.type === 'list') {
+    if (data === undefined) return { error: true, content: 'Cannot Perform "Read" Operation On <none>' }
+    else if (data.type === 'string' || data.type === 'list') {
       if (Array.isArray(key)) {
         if (data.type === 'string') data.value = data.value.substring(key[0], key[1]+1)
         else {
@@ -27,12 +28,14 @@ function read (data, path) {
         else {
           if (data.address !== undefined) data.address.path.push(key)
 
-          data.type = data.value[key].type
-          data.value = data.value[key].value
+          if (data.value[key] === undefined) data = { type: 'empty', value: 'Empty' }
+          else {
+            data.type = data.value[key].type
+            data.value = data.value[key].value
+          }
         }
       }
-    } else if (data === undefined) return { error: true, content: 'Cannot Perform "Read" Operation On <none>' }
-    else return { error: true, content: `Cannot Perform "Read" Operation On <${data.type}>` }
+    } else return { error: true, content: `Cannot Perform "Read" Operation On <${data.type}>` }
   }
 
   return { error: false, data }
@@ -65,8 +68,6 @@ function instruction_read (Core, chunk, instruction) {
 
     result = read(result, path)
     if (result.error) return result
-
-    console.log(result.data)
 
     Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', result.data, true)
 

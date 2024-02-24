@@ -52,9 +52,7 @@ export default class {
       callPath
     }
 
-    localBoxes.forEach((box) => {
-      this.#Core.MemoryManager.create(this.#chunks[id].chunkMemoryAddress, box.name, box.data, box.lock)
-    })
+    localBoxes.forEach((box) => this.#Core.MemoryManager.create(this.#chunks[id].chunkMemoryAddress, box.name, box.data, box.lock))
 
     return id
   }

@@ -5,7 +5,7 @@ export default (Core, chunk, instruction) => {
   if (result.type === 'actionList') {
     if (chunk.actionData.calling === undefined) {
       if (chunk.returnedData.length < 1 && instruction.keys.length > 0) {
-        Core.ChunkManager.createChildChunks(Core, chunk, instruction.keys.map((actions) => actions))
+        Core.ChunkManager.createChildChunks(Core, chunk, instruction.keys.map((actions) => [actions]))
 
         return true
       } else {

@@ -39,6 +39,12 @@ export default (Core, chunk, action) => {
     if (typeof result === 'object') return result
 
     wait = result === true
+  } else if (instruction.type === 'ifElse') {
+    const result = instruction_ifElse(Core, chunk, instruction)
+
+    if (typeof result === 'object') return result
+
+    wait = result === true
   }
 
   if (!wait) {
@@ -56,6 +62,7 @@ export default (Core, chunk, action) => {
 }
 
 import { instruction_read } from './Instructions/Read.js'
+import instruction_ifElse from './Instructions/IfElse.js'
 import { instruction_get } from './Instructions/Get.js'
 import { instruction_set } from './Instructions/Set.js'
 import instruction_call from './Instructions/Call.js'

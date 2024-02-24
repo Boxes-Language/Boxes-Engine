@@ -70,7 +70,7 @@ export default async (Compiler, string) => {
 
         let value
 
-        if (operation[operation.length-2] !== undefined && checkFragment(operation[operation.length-1], { type: ['operator'], value: ['-'] })) {
+        if (checkFragment(operation[operation.length-1], { type: ['operator'], value: ['-'] }) && checkFragment(operation[operation.length-2], { type: ['operator'], value: expressionOperators })) {
           operation.splice(operation.length-1, 1)
 
           value = `-${string[i]}`
@@ -194,3 +194,5 @@ import checkFragment from '../CheckFragment.js'
 
 const operators = ['@', '!', '?', ':', '<-', '->', '+', '-', '*', '/', '=', '==', '>', '>=', '<', '<=', '&&', '||', ',', '|', '~']
 const keywords = ['import', 'as', 'async', 'return']
+
+const expressionOperators = ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<=', '&&', '||']

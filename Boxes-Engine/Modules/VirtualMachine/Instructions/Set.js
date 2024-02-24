@@ -35,7 +35,11 @@ function instruction_set (Core, chunk, instruction) {
     if (target.address === undefined) return { error: true, content: `Cannot Assign Value To The Target (Target Is Not In A Box)`, line: instruction.line, start: instruction.start }
 
     const result = set(Core, target.address, source)
-    if (result.error) return result
+    if (result.error) {
+      if (result.content === 'Locked') return { error: true, content: `Box Named "${target.address.name}" Is Locked (Cannot Assign Value To A Locked Box)`, line: instruction.line, start: instruction.start }
+
+      return result
+    }
 
     chunk.returnedData = []
 

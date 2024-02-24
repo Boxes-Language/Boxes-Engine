@@ -1,6 +1,7 @@
 export default parseInstruction
 
 import splitArray from '../../Tools/SplitArray.js'
+import checkFragment from '../CheckFragment.js'
 
 const expressionOperators = ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<=', '&&', '||']
 
@@ -75,6 +76,41 @@ function parseInstruction (fragments) {
       if (instructions3.error) return instructions3
 
       instructions.push({ type: (fragment.type === 'list') ? 'read' : 'call', keys: instructions3.data[0].data.value, line: fragment.line, start: fragment.start })
+    } else if (fragments[0].type === 'inputList' && checkFragment(fragments[1], { type: ['operator'], value: ['?', ':'] })) {
+      const instructions2 = parseInstruction([fragments[0]])
+      if (instructions2.error) return instructions2
+
+      if (fragments[2] === undefined) return { error: true, content: `Expecting <actionList>`, line: fragments[1].line, start: fragments[1].end }
+      else {
+        if (fragments[1].value === '?') {
+          const instructions3 = parseInstruction([fragments[2]])
+          if (instructions3.error) return instructions3
+
+          let ifActionList = instructions3.data[0].data.value
+          let elseActionList = []
+
+          if (fragments[3] !== undefined) {
+            if (fragments[3].type === 'operator' && fragments[3].value === ':') {
+              if (fragments[4] === undefined || fragments[4].type !== 'actionList') return { error: true, content: `Expecting <actionList>`, line: fragments[3].line, start: fragments[3].end }
+              else {
+                if (fragments[5] !== undefined) return { error: true, content: `Unexpected "${fragments[5].value}" <${fragments[5].type}>`, line: fragments[5].line, start: fragments[5].start } 
+
+                const instructions4 = parseInstruction([fragments[4]])
+                if (instructions4.error) return instructions4
+
+                elseActionList = instructions4.data[0].data.value
+              }
+            } else return { error: true, content: `Unexpected "${fragments[3].value}" <${fragments[3].type}>`, line: fragments[3].line, start: fragments[3].start }
+          }
+
+          instructions.push({ type: 'ifElse', condition: [instructions2.data[0].data.value[0]], ifActionList, elseActionList, line: fragments[0].line, start: fragments[0].start })
+        } else {
+          const instructions3 = parseInstruction(fragments[2].value)
+          if (instructions3.error) return instructions3
+
+          instructions.push({ type: 'loop', condition: [instructions2.data[0].data.value[0]], actionList: instructions3.data[0].data.value, line: fragments[0].line, start: fragments[0].start })
+        }
+      }
     } else if (fragments[0].type === 'keyword' && fragments[0].value === 'async') {
       instructions.push({ type: 'method', name: 'async' })
 

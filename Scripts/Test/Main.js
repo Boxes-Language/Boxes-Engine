@@ -5,11 +5,21 @@ import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 const executable = (await new Compiler()
   .compile(
 `
-+@functions <- [{ 1 }, { 2 }]
+# +@main <- 1 + 1 | Result - 1 
 
-+@main <- functions[0]()
++@function <- {
+  (Input[0]) ? {
+    1
+  } : {
+    2
+  }
+}
+
++@main <- function(Yes)
 `
   ))
+
+// console.log(JSON.stringify(executable, null, 2))
 
 // Execute
 async function execute () {
