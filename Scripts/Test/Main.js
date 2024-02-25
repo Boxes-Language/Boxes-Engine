@@ -7,7 +7,7 @@ const executable = (await new Compiler()
 `
 +count <- 0
 
-+@main <- (100, count) : { count }
++@main <- (1000, count) : { count }
 `
   ))
 

@@ -1,16 +1,18 @@
 // Loop Instruction
 export default (Core, chunk, instruction) => {
   if (chunk.actionData.calling === undefined) {
-    if (chunk.returnedData.length < 1) {
+    if (chunk.returnedData.length < 1 && chunk.actionData.static !== true) {
       Core.ChunkManager.createChildChunks(Core, chunk, instruction.condition.map((actions) => [actions]))
 
       return true
     } else {
       let loop = false
 
+      if (chunk.actionData.static === true) chunk.returnedData = chunk.actionData.staticData
+
       if (chunk.returnedData[0].type === 'boolean') {
         if (chunk.returnedData[0].value === 'Yes') {
-          chunk.actionData.count = 0 
+          chunk.actionData.count = 0
 
           loop = true
         }
@@ -36,11 +38,22 @@ export default (Core, chunk, instruction) => {
           }
         }
 
+        if (chunk.actionData.static === undefined && chunk.returnedData[0].address === undefined) {
+          chunk.actionData.static = true
+          chunk.actionData.staticData = chunk.returnedData
+        }
+
         Core.ChunkManager.createChildChunks(Core, chunk, [instruction.actionList])
 
         chunk.actionData.calling = true
 
         return true
+      } else {
+        chunk.returnedData = []
+
+        chunk.actionData.static = undefined
+        chunk.actionData.count = undefined
+        chunk.actionData.calling = undefined
       }
     }
   } else {
