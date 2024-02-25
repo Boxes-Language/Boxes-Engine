@@ -119,14 +119,12 @@ export default class {
   executeChunk (id) {
     const chunk = this.#chunks[id]
 
-    const result = executeAction(this.#Core, chunk, chunk.actions[chunk.currentAction])
-
     if (chunk.currentAction >= chunk.actions.length) {
       const result = this.deleteChunk(id)
       if (result.error) return result
-    }
 
-    return result
+      return { error: false, data: { type: 'empty', value: 'Empty' }}
+    } else return executeAction(this.#Core, chunk, chunk.actions[chunk.currentAction])
   }
 }
 

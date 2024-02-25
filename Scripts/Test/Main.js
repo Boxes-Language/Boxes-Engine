@@ -5,9 +5,7 @@ import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 const executable = (await new Compiler()
   .compile(
 `
-+count <- 0
-
-+@main <- (1000, count) : { count }
++@main <- (1000) : {}
 `
   ))
 
@@ -16,8 +14,10 @@ const executable = (await new Compiler()
 // Execute
 async function execute () {
   const vm = new VirtualMachine()
+
+  const start = performance.now()
   
-  console.log('Finished', await vm.start(executable.data))
+  console.log('Finished', await vm.start(executable.data), parseFloat((performance.now()-start)/1000).toFixed(2))
 }
 
 execute()

@@ -32,5 +32,7 @@ export default (Core, chunk, instruction) => {
       chunk.actionData.calling = undefined
       chunk.returnedData = []
     }
-  } else return { error: true, content: `Cannot Perform "Call" Operation On <${result.type}>` }
+  } else return createError(`Cannot Perform "Call" Operation On <${result.type}>`, chunk.callPath)
 }
+
+import { createError } from '../Error.js'
