@@ -105,10 +105,10 @@ function parseInstruction (fragments) {
 
           instructions.push({ type: 'ifElse', condition: [instructions2.data[0].data.value[0]], ifActionList, elseActionList, line: fragments[0].line, start: fragments[0].start })
         } else {
-          const instructions3 = parseInstruction(fragments[2].value)
+          const instructions3 = parseInstruction([fragments[2]])
           if (instructions3.error) return instructions3
 
-          instructions.push({ type: 'loop', condition: [instructions2.data[0].data.value[0]], actionList: instructions3.data[0].data.value, line: fragments[0].line, start: fragments[0].start })
+          instructions.push({ type: 'loop', condition: instructions2.data[0].data.value, actionList: instructions3.data[0].data.value, line: fragments[0].line, start: fragments[0].start })
         }
       }
     } else if (fragments[0].type === 'keyword' && fragments[0].value === 'async') {

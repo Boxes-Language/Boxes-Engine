@@ -2,9 +2,10 @@ export { set, instruction_set }
 
 // Set
 function set (Core, address, data) {
-  let target = Core.MemoryManager.read(address.chunkID, address.name)
 
   if (address.path.length > 0) {
+    let target = Core.MemoryManager.read(address.chunkID, address.name)
+
     for (let i = 0; i < address.path.length - 1; i++) target = target.value[address.path[i]]
 
     if (data.type === 'fire') target.value.splice(address.path[address.path.length-1], 1)
@@ -17,7 +18,7 @@ function set (Core, address, data) {
     Core.MemoryManager.delete(address.chunkID, address.name)
 
     return { error: false }
-  } else return Core.MemoryManager.write(address.chunkID, address.name, target)
+  } else return Core.MemoryManager.write(address.chunkID, address.name, data)
 }
 
 // Set Instruction

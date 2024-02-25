@@ -11,6 +11,8 @@ export default (Core, chunk, instruction) => {
     } else {
       if (chunk.returnedData[0].type === 'boolean') {
         if (chunk.returnedData[0].value === 'Yes') {
+          console.log([instruction.ifActionList])
+
           Core.ChunkManager.createChildChunks(Core, chunk, [instruction.ifActionList])
 
           chunk.actionData.calling = true
@@ -18,6 +20,7 @@ export default (Core, chunk, instruction) => {
           return true
         } else if (instruction.elseActionList.length > 0) {
           console.log(instruction.elseActionList)
+
           Core.ChunkManager.createChildChunks(Core, chunk, [instruction.elseActionList])
 
           chunk.actionData.calling = true

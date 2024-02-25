@@ -5,17 +5,9 @@ import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 const executable = (await new Compiler()
   .compile(
 `
-# +@main <- 1 + 1 | Result - 1 
++count <- 0
 
-+@function <- {
-  (Input[0]) ? {
-    1
-  } : {
-    2
-  }
-}
-
-+@main <- function(Yes)
++@main <- (100, count) : { count }
 `
   ))
 

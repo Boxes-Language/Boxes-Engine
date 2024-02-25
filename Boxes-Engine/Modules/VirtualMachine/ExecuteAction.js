@@ -45,6 +45,12 @@ export default (Core, chunk, action) => {
     if (typeof result === 'object') return result
 
     wait = result === true
+  } else if (instruction.type === 'loop') {
+    const result = instruction_loop(Core, chunk, instruction)
+
+    if (typeof result === 'object') return result
+
+    wait = result === true
   }
 
   if (!wait) {
@@ -68,3 +74,4 @@ import { instruction_set } from './Instructions/Set.js'
 import instruction_call from './Instructions/Call.js'
 import instruction_data from './Instructions/Data.js'
 import instruction_math from './Instructions/Math.js'
+import instruction_loop from './Instructions/Loop.js' 
