@@ -24,16 +24,14 @@ export default (Core, chunk, instruction) => {
 
           loop = true
         }
-      } else return { error: true, content: `Cannot Perform "Loop" Operation On <${chunk.returnedData[0].type}>`, line: instruction.line, start: instruction.start }
-
+      } else return createError(`Cannot Perform "Loop" Operation On <${chunk.returnedData[0].type}>`, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start })
       if (loop) {
         if (chunk.returnedData[1] !== undefined) {
           if (chunk.returnedData[1].address === undefined) return { error: true, content: `Cannot Assign Value To The Target (Target Is Not In A Box)`, line: instruction.line, start: instruction.start }
 
           const result = set(Core, chunk.returnedData[1].address, { type: 'number', value: `${chunk.actionData.count}` })
           if (result.error) {
-            if (result.content === 'Locked') return { error: true, content: `Box Named "${target.address.name}" Is Locked (Cannot Assign Value To A Locked Box)`, line: instruction.line, start: instruction.start }
-
+            if (result.content === 'Locked') return createError(`Box Named "${target.address.name}" Is Locked (Cannot Assign Value To A Locked Box)`, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start }) 
             return result
           }
         }
@@ -66,5 +64,7 @@ export default (Core, chunk, instruction) => {
     return true
   }
 }
+
+import { createError } from '../Error.js'
 
 import { set } from './Set.js'

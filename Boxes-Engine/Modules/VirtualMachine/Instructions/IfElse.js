@@ -11,23 +11,19 @@ export default (Core, chunk, instruction) => {
     } else {
       if (chunk.returnedData[0].type === 'boolean') {
         if (chunk.returnedData[0].value === 'Yes') {
-          console.log([instruction.ifActionList])
-
           Core.ChunkManager.createChildChunks(Core, chunk, [instruction.ifActionList])
 
           chunk.actionData.calling = true
 
           return true
         } else if (instruction.elseActionList.length > 0) {
-          console.log(instruction.elseActionList)
-
           Core.ChunkManager.createChildChunks(Core, chunk, [instruction.elseActionList])
 
           chunk.actionData.calling = true
 
           return true
         }
-      } else return { error: true, content: `Cannot Perform "If" Operation Using <${chunk.returnedData[0].type}>`, line: instruction.line, start: instruction.start }
+      } else return createError(`Cannot Perform "If" Operation Using <${chunk.returnedData[0].type}>`, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start })
     }
   } else {
     Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', chunk.returnedData[0], true)
@@ -36,3 +32,5 @@ export default (Core, chunk, instruction) => {
     chunk.returnedData = []  
   }
 }
+
+import { createError } from '../Error.js'

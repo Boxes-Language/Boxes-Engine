@@ -5,7 +5,11 @@ import { VirtualMachine, Compiler } from '../../Boxes-Engine/API.js'
 const executable = (await new Compiler()
   .compile(
 `
-+@main <- (1000) : {}
++@function <- {
+  a
+}
+
++@main <- (1000) : { function() }
 `
   ))
 
@@ -14,6 +18,8 @@ const executable = (await new Compiler()
 // Execute
 async function execute () {
   const vm = new VirtualMachine()
+
+  console.log('Start')
 
   const start = performance.now()
   

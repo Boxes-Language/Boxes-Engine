@@ -1,13 +1,17 @@
-export { createError, addPath }
+export { createError }
 
 // Create Error
 function createError (content, callPath) {
-  return { error: true, content, callPath }
-}
+  return {
+    error: true,
+    content,
+    callPath,
 
-// Add Path
-function addPath (errorData, location) {
-  errorData.callPath.push(location)
+    // Add Call Path
+    addCallPath (location) {
+      this.callPath.push(location)
 
-  return errorData
+      return this
+    }
+  }
 }

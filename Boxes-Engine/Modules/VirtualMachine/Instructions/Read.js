@@ -62,15 +62,17 @@ function instruction_read (Core, chunk, instruction) {
 
       for (let i = 0; i < chunk.returnedData[0].value.length; i++) {
         if (chunk.returnedData[0].value[i].type === 'number') path.push(+chunk.returnedData[0].value[i].value)
-        else return { error: true, content: `Cannot Perform "Read" Operation Using [${chunk.returnedData[0].value.map((data) => `<${data.type}>`).join(', ')}] (Item ${i} Is A <${chunk.returnedData[0].value[i].type}>, Expecting A <number>)`, line: instruction.line, start: instruction.start }
+        else return createError(`Cannot Perform "Read" Operation Using [${chunk.returnedData[0].value.map((data) => `<${data.type}>`).join(', ')}] (Item ${i} Is A <${chunk.returnedData[0].value[i].type}>, Expecting A <number>)`, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start })
       }
-    } else return { error: true, content: `Cannot Perform "Read" Operation Using <${chunk.returnedData[0].type}>`, line: instruction.line, start: instruction.start }
+    } else return createError(`Cannot Perform "Read" Operation Using <${chunk.returnedData[0].type}>`, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start })
 
     result = read(result, path)
-    if (result.error) return result
+    if (result.error) return createError(result.content, chunk.callPath).addCallPath({ lbracket: instruction.lbracket, line: instruction.line, start: instruction.start })
 
     Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', result.data, true)
 
     chunk.returnedData = []
   }
 }
+
+import { createError } from '../Error.js'

@@ -32,7 +32,9 @@ function get (Core, chunk, name, path) {
 function instruction_get (Core, chunk, instruction) {
   const data = get(Core, chunk, instruction.name, [])
 
-  if (data.error) return { error: true, content: data.content, line: instruction.line, start: instruction.start }
+  if (data.error) return createError(data.content, chunk.callPath).addCallPath({ line: instruction.line, start: instruction.start })
 
   Core.MemoryManager.write(chunk.chunkMemoryAddress, 'Result', data.data, true)
 }
+
+import { createError } from '../Error.js'
