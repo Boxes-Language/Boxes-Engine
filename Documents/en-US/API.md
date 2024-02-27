@@ -1,12 +1,46 @@
 # API Document
-
+* [Compiler](#compiler)
+  * [compile()](#compile)
 * [VirtualMachine](#virtualmachine)
   * [start()](#start)
   * [stop()](#stop)
   * [listen()](#listen)
-* [Compiler](#compiler)
-  * [compile()](#compile)
 * [Data Structures](#datastructures)
+
+# Compiler
+```js
+const { Compiler } = require('./Boxes-Engine/API.js')
+
+new Compiler(<options>) // Create A Compiler
+```
+* `options <undefined || object>` | Options For The Compiler
+  * `loopInterval <number>` | The interval for loop (this can make the compiler "lazy") `Default: 0`
+
+## compile()
+```js
+await .compile(<string>) // Compile Boxes code
+```
+* `string <string>` | The code that you want to compile
+
+> return `<object>`
+
+```js
+// When there's an error
+{ error: true, errors: <array> }
+
+// errors | The errors
+
+{ content: <string>, line: <number>, start: <number> }
+
+// content | The content of the error
+// line | The line which the error occur
+// index | The index which the error occur
+
+// When it executed successfully
+{ error: false, data: <Boxes Executable> }
+
+// data
+```
 
 # VirtualMachine
 ```js
@@ -50,41 +84,6 @@ await .start(<executable>, <location>) // Start The Virtual Machine
 ```
 
 > return `<undefined>`
-
-# Compiler
-```js
-const { Compiler } = require('./Boxes-Engine/API.js')
-
-new Compiler(<options>) // Create A Compiler
-```
-* `options <undefined || object>` | Options For The Compiler
-  * `loopInterval <number>` | The interval for loop (this can make the compiler "lazy") `Default: 0`
-
-## compile()
-```js
-await .compile(<string>) // Compile Boxes code
-```
-* `string <string>` | The code that you want to compile
-
-> return `<object>`
-
-```js
-// When there's an error
-{ error: true, errors: <array> }
-
-// errors | The errors
-
-{ content: <string>, line: <number>, start: <number> }
-
-// content | The content of the error
-// line | The line which the error occur
-// index | The index which the error occur
-
-// When it executed successfully
-{ error: false, data: <Boxes Executable> }
-
-// data
-```
 
 # Data Structures
 
