@@ -6,7 +6,7 @@
   * [listen()](#listen)
 * [Compiler](#compiler)
   * [compile()](#compile)
-* [Data Structures](datastructures)
+* [Data Structures](#datastructures)
 
 # VirtualMachine
 ```js
@@ -39,7 +39,7 @@ await .start(<executable>, <location>) // Start The Virtual Machine
 // index | The index which the error occur
 
 // When it executed successfully
-{ error: false, data: <object> }
+{ error: false, data: <Boxes Data> }
 
 // data
 ```
@@ -66,7 +66,25 @@ await .compile(<string>) // Compile Boxes code
 ```
 * `string <string>` | The code that you want to compile
 
-> return `<object> (Boxes executable)`
+> return `<object>`
+
+```js
+// When there's an error
+{ error: true, errors: <array> }
+
+// errors | The errors
+
+{ content: <string>, line: <number>, start: <number> }
+
+// content | The content of the error
+// line | The line which the error occur
+// index | The index which the error occur
+
+// When it executed successfully
+{ error: false, data: <Boxes Executable> }
+
+// data
+```
 
 # Data Structures
 
