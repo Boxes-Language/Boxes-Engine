@@ -9,6 +9,8 @@ export default class {
     this.#Core = Core
   }
 
+  get size () {return this.#size}
+
   // Register Chunk
   registerChunk () {
     const id = generateAddress(this.#Core.options.addressLength, Object.keys(this.#chunks))

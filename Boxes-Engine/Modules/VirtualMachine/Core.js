@@ -33,7 +33,7 @@ export default class {
             this.#callback(result)
 
             break
-          } else this.#result = result.data
+          } else if (result.data !== undefined) this.#result = result.data
         } else {
           this.TimerManager.deleteTimer(timer)
 
@@ -53,3 +53,6 @@ import MemoryManager from './Managers/MemoryManager.js'
 import ChunkManager from './Managers/ChunkManager.js'
 import TimerManager from './Managers/TimerManager.js'
 import TaskManager from './Managers/TaskManager.js'
+
+import getRandom from '../Tools/GetRandom.js'
+

@@ -103,9 +103,10 @@ export default class {
       }
     }
 
-    delete this.#chunks[id]
-
     this.#Core.TaskManager.removeTask(id)
+    this.#Core.MemoryManager.deleteChunk(this.#chunks[id].chunkMemoryAddress)
+
+    delete this.#chunks[id]
 
     return { error: false }
   }
@@ -119,12 +120,8 @@ export default class {
   executeChunk (id) {
     const chunk = this.#chunks[id]
 
-    if (chunk.currentAction >= chunk.actions.length) {
-      const result = this.deleteChunk(id)
-      if (result.error) return result
-
-      return { error: false, data: { type: 'empty', value: 'Empty' }}
-    } else return executeAction(this.#Core, chunk, chunk.actions[chunk.currentAction])
+    if (chunk.currentAction >= chunk.actions.length) return this.deleteChunk(id)
+    else return executeAction(this.#Core, chunk, chunk.actions[chunk.currentAction])
   }
 }
 
