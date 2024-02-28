@@ -21,7 +21,7 @@ new Compiler(<options>) // Create A Compiler
   * `loopInterval <number>` | The interval for loop (this can make the compiler "lazy"). `Default: 0`
 
 > [!NOTE]
-> You can set `loopInterval` to `0` to make it not lazy.
+> You can set `loopInterval` to `0` to make it not "lazy".
 
 ## compile()
 ```js
