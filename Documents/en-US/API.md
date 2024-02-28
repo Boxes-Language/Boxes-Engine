@@ -45,8 +45,6 @@ await .compile(<string>) // Compile Boxes code
 
 // When it executed successfully
 { error: false, data: <Boxes Executable> }
-
-// data
 ```
 [[Boxes Executable](#boxes-executable)]
 
@@ -59,15 +57,15 @@ new VirtualMachine(<options>) // Create A Virtual Machine
 * `options <undefined || object>` | Options For The Virtual Machine.
   * `chunkPerExecution <number>` | The amount of chunks that will be execute in a execution. `Default: 100`
   * `executionInterval <number>` | The interval between execution (ms). `Default: 0`
-  * `maxMemory <number>` |  The limitation for the virtual memory (bytes). `Default: Infinity`
+  * `maxMemory <number>` | The limitation for the virtual memory (bytes). `Default: Infinity`
   * `maxChunks <number>` | The limitation for the amount of chunks. `Default: Infinity`
-  * `addressLength <number>` | The length of memory address, chunk address. `Default: 5`
+  * `addressLength <number>` | The length of virtual memory address, chunk address. `Default: 5`
  
 ## start()
 ```js
 await .start(<executable>, <location>) // Start The Virtual Machine
 ```
-* `executable <object>` | A [Boxes Executable](#boxesexecutable).
+* `executable <object>` | A [Boxes Executable](#boxes-executable).
 * `location <string>` | The location of the workspace.
 
 > return `<object>`
@@ -101,21 +99,21 @@ import { Info } from './Boxes-Engine.js'
 
 ## version
 ```
-.version // Get The Version Of Boxes Engine
+.version // Get The Version Of Boxes-Engine
 ```
 
 return `<string>`
 
 ## buildDate
 ```
-.buildDate // Get The Build Date Of Boxes Engine
+.buildDate // Get The Build Date Of Boxes-Engine
 ```
 
 > return `<string>`
 
 ## github
 ```
-.github // Get The Github Repository Link Of Boxes Engine
+.github // Get The Github Repository Link Of Boxes-Engine
 ```
 
 > return `<string>`
