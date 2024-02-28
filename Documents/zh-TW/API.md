@@ -1,4 +1,4 @@
-# API Document
+# API 文檔
 * [Compiler](#compiler)
   * [compile()](#compile)
 * [VirtualMachine](#virtualmachine)
