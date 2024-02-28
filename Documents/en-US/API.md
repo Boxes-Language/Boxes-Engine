@@ -45,6 +45,7 @@ await .compile(<string>) // Compile Boxes code
 
 // data
 ```
+[[Boxes Executable](#boxes-executable)]
 
 # VirtualMachine
 ```js
@@ -81,6 +82,7 @@ await .start(<executable>, <location>) // Start The Virtual Machine
 
 // data
 ```
+[[Boxes Data](#boxes-data)]
 
 ## stop()
 ```js
