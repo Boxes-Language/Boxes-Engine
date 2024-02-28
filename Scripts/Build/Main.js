@@ -4,39 +4,49 @@ import chalk from 'chalk'
 import path from 'path'
 import fs from 'fs'
 
-console.log(' 📌 Updating Build Info')
+import checkFiles from './CheckFiles.js'
 
-const info = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/Info.json')))
+console.log(' 🔎 Checking For Errors')
 
-const date = new Date()
+const hasProblems = await checkFiles(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine'))
 
-const dateString = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+if (!hasProblems) {
+  console.log('')
 
-fs.writeFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/Buildinfo.json'), JSON.stringify({
-  version: info.version,
-  buildDate: dateString,
+  console.log(' 📌 Updating Build Info')
 
-  github: info.github
-}, null, 2))
+  const info = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/Info.json')))
 
-console.log(chalk.green(' 📌 Successfully Updated Build Info'))
+  const date = new Date()
 
-console.log(chalk.magenta(`\n 📋 Build Info\n ┕  Version: ${info.version}\n ┕  Build Date: ${dateString}\n`))
+  const dateString = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
 
-console.log(' 📦 Bundling')
+  fs.writeFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/Buildinfo.json'), JSON.stringify({
+    version: info.version,
+    buildDate: dateString,
 
-await build({
-  entry: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/API.js')],
-  outDir: path.join(path.dirname(fileURLToPath(import.meta.url)), 'Cache'),
+    github: info.github
+  }, null, 2))
 
-  minify: 'terser',
-  format: 'esm',
+  console.log(chalk.green(' 📌 Successfully Updated Build Info'))
 
-  silent: true
-})
+  console.log(chalk.magenta(`\n 📋 Build Info\n ┕  Version: ${info.version}\n ┕  Build Date: ${dateString}\n`))
 
-fs.renameSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'Cache', 'API.js'), path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Assets/Boxes-Engine.js'))
+  console.log(' 📦 Bundling')
 
-console.log(chalk.green(' 📦 Successfully Bundled'))
+  await build({
+    entry: [path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine/API.js')],
+    outDir: path.join(path.dirname(fileURLToPath(import.meta.url)), 'Cache'),
+
+    minify: 'terser',
+    format: 'esm',
+
+    silent: true
+  })
+
+  fs.renameSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'Cache', 'API.js'), path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Assets/Boxes-Engine.js'))
+
+  console.log(chalk.green(' 📦 Successfully Bundled'))
+}
 
 console.log('')
