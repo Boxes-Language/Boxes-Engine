@@ -5,11 +5,12 @@
   * [start()](#start)
   * [stop()](#stop)
   * [listen()](#listen)
-* [Data Structures](#datastructures)
+* [Info](#info)
+* [Data Structures](#data-structures)
 
 # Compiler
 ```js
-const { Compiler } = require('./Boxes-Engine/API.js')
+import { Compiler } from './Boxes-Engine.js'
 
 new Compiler(<options>) // Create A Compiler
 ```
@@ -44,12 +45,12 @@ await .compile(<string>) // Compile Boxes code
 
 # VirtualMachine
 ```js
-const { VirtualMachine } = require('./Boxes-Engine/API.js')
+import { VirtualMachine } from './Boxes-Engine.js'
 
 new VirtualMachine(<options>) // Create A Virtual Machine
 ```
 * `options <undefined || object>` | Options For The Virtual Machine
-  * `chunkPerExecution <number>` | `Default: 100`
+  * `chunkPerExecution <number>` | The amount of chunks that will be execute in a execution `Default: 100`
   * `executionInterval <number>` | The interval between execution (ms) `Default: 0`
   * `maxMemory <number>` |  The limitation for the virtual memory (bytes) `Default: Infinity`
   * `maxChunks <number>` | The limitation for the amount of chunks `Default: Infinity`
@@ -84,6 +85,32 @@ await .start(<executable>, <location>) // Start The Virtual Machine
 ```
 
 > return `<undefined>`
+
+# Info
+```js
+import { Info } from './Boxes-Engine.js'
+```
+
+## version
+```
+.version // Get The Version Of Boxes Engine
+```
+
+return `<string>`
+
+## buildDate
+```
+.buildDate // Get The Build Date Of Boxes Engine
+```
+
+> return `<string>`
+
+## github
+```
+.github // Get The Github Repository Link Of Boxes Engine
+```
+
+> return `<string>`
 
 # Data Structures
 
