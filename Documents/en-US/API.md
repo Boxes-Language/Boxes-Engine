@@ -6,6 +6,9 @@
   * [stop()](#stop)
   * [listen()](#listen)
 * [Info](#info)
+  * [version](#version)
+  * [buildDate](#builddate)
+  * [github](#github)
 * [Data Structures](#data-structures)
 
 # Compiler
