@@ -17,14 +17,17 @@ import { Compiler } from './Boxes-Engine.js'
 
 new Compiler(<options>) // Create A Compiler
 ```
-* `options <undefined || object>` | Options For The Compiler
-  * `loopInterval <number>` | The interval for loop (this can make the compiler "lazy") `Default: 0`
+* `options <undefined || object>` | Options For The Compiler.
+  * `loopInterval <number>` | The interval for loop (this can make the compiler "lazy"). `Default: 0`
+
+> [!NOTE]
+> You can set `loopInterval` to `0` to make it not lazy.
 
 ## compile()
 ```js
 await .compile(<string>) // Compile Boxes code
 ```
-* `string <string>` | The code that you want to compile
+* `string <string>` | The code that you want to compile.
 
 > return `<object>`
 
@@ -53,19 +56,19 @@ import { VirtualMachine } from './Boxes-Engine.js'
 
 new VirtualMachine(<options>) // Create A Virtual Machine
 ```
-* `options <undefined || object>` | Options For The Virtual Machine
-  * `chunkPerExecution <number>` | The amount of chunks that will be execute in a execution `Default: 100`
-  * `executionInterval <number>` | The interval between execution (ms) `Default: 0`
-  * `maxMemory <number>` |  The limitation for the virtual memory (bytes) `Default: Infinity`
-  * `maxChunks <number>` | The limitation for the amount of chunks `Default: Infinity`
-  * `addressLength <number>` | The length of memory address, chunk address `Default: 5`
+* `options <undefined || object>` | Options For The Virtual Machine.
+  * `chunkPerExecution <number>` | The amount of chunks that will be execute in a execution. `Default: 100`
+  * `executionInterval <number>` | The interval between execution (ms). `Default: 0`
+  * `maxMemory <number>` |  The limitation for the virtual memory (bytes). `Default: Infinity`
+  * `maxChunks <number>` | The limitation for the amount of chunks. `Default: Infinity`
+  * `addressLength <number>` | The length of memory address, chunk address. `Default: 5`
  
 ## start()
 ```js
 await .start(<executable>, <location>) // Start The Virtual Machine
 ```
-* `executable <object>` | A [Boxes Executable](#boxesexecutable)
-* `location <string>` | The location of the workspace
+* `executable <object>` | A [Boxes Executable](#boxesexecutable).
+* `location <string>` | The location of the workspace.
 
 > return `<object>`
 
@@ -123,12 +126,12 @@ return `<string>`
 ```js
 { operations, imports }
 ```
-* `operations <array>` | Operations
-* `imports <array>` | Imports
+* `operations <array>` | Operations.
+* `imports <array>` | Imports.
 
 ## Boxes Data
 ```js
 { type, value }
 ```
-* `type <string>` | The type of the data
-* `value <any>` | The value of the data
+* `type <string>` | The type of the data.
+* `value <any>` | The value of the data.
