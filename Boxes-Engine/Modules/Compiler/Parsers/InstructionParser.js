@@ -105,6 +105,8 @@ function parseInstruction (fragments) {
 
           instructions.push({ type: 'ifElse', condition: [instructions2.data[0].data.value[0]], ifActionList, elseActionList, line: fragments[0].line, start: fragments[0].start })
         } else {
+          if (fragments[3] !== undefined) return { error: true, content: `Unexpected "${fragments[3].value}" <${fragments[3].type}>`, line: fragments[3].line, start: fragments[3].start  }
+
           const instructions3 = parseInstruction([fragments[2]])
           if (instructions3.error) return instructions3
 

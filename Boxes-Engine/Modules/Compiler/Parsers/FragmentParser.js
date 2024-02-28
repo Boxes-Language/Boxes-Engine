@@ -152,7 +152,7 @@ export default async (Compiler, string) => {
 // Parse List
 async function parseList (Compiler, fragments) {
   const fragments2 = []
-  const errors = []
+  let errors = []
 
   let state = {}
 

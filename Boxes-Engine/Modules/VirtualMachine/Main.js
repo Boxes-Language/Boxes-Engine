@@ -1,8 +1,5 @@
 // Vitual Machine
 export default class {
-  #state = 'idle'
-  #options
-
   #Core
 
   constructor (options) {
@@ -10,8 +7,8 @@ export default class {
       options: { type: ['undefined', 'object'] }
     }, { options })
 
-    this.#options = Object.assign({
-      chunkPerExecution: 10,
+    options = Object.assign({
+      chunkPerExecution: 100,
       executionInterval: 0,
 
       maxMemory: Infinity,
@@ -28,10 +25,13 @@ export default class {
       maxChunks: { type: ['number'] },
 
       addressLength: { type: ['number'] }
-    }, this.#options)
+    }, options)
+
+    this.#Core = new Core(options)
   }
 
-  get state () {return this.#state}
+  get state () {return this.#Core.state}
+  get options () {return this.#Core.options}
 
   // Start The Virtual Machine
   async start (executable, location) {
@@ -45,19 +45,20 @@ export default class {
       imports: { type: ['array'] }
     }, executable)
 
-
-    if (this.#state === 'idle') {
-      return new Promise((resolve) => {
-        this.#Core = new Core(this.#options, (data) => resolve(data), executable, location)
-      })
-    } else throw new Error(`Cannot Start The Virtual Machine (State: ${this.#state})`)
+    return await this.#Core.start(executable, location)
   }
 
   // Stop The Virtual Machine
   stop () {
-    if (this.#state === 'running') {
+    this.#Core.stop()
+  }
 
-    } else throw new Error(`Cannot Stop The Virtual Machine (State: ${this.#state})`)
+  // Listen To Event
+  listen (name, callback) {
+    checkParameters({
+      name: { type: ['string'], value: ['start', 'stop'] },
+      callback: { type: ['function'] }
+    }, { name, callback })
   }
 }
 

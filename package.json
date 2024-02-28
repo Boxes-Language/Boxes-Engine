@@ -1,3 +1,14 @@
 {
-  "type": "module"
+  "type": "module",
+
+  "scripts": {
+    "build": "node ./Scripts/Build/Main.js"
+  },
+
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "terser": "^5.28.1",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
+  }
 }
