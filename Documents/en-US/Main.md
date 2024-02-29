@@ -1,8 +1,6 @@
 # Boxes-Engine
 The core of Boxes, includes the compiler and the virtual machine.
 
-[[API Document](./API.md)]
-
 ## Download Boxes-Engine
 1. Download [Boxes-Engine.js](../../Assets/Boxes-Engine.js).
 2. Move `Boxes-Engine.js` into your project.
@@ -10,3 +8,5 @@ The core of Boxes, includes the compiler and the virtual machine.
 ```js
 import { ... } from '<The Path To Boxes-Engine.js>'
 ```
+
+[[API Document](./API.md)]
