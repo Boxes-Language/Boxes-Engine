@@ -58,7 +58,7 @@ new VirtualMachine(<options>) // 創建一個虛擬機
   * `chunkPerExecution <number>` | 每次執行的區塊數。 `預設: 100`
   * `executionInterval <number>` | 每次執行的間隔 (毫秒)。 `預設: 0`
   * `maxMemory <number>` | 虛擬記憶體的使用上限 (bytes)。 `預設: Infinity`
-  * `maxChunks <number>` | 區塊樹的上限。 `預設: Infinity`
+  * `maxChunks <number>` | 區塊數的上限。 `預設: Infinity`
   * `addressLength <number>` | 虛擬記憶體地址、區塊地址的長度。 `預設: 5`
  
 ## start()
