@@ -6,7 +6,7 @@ import fs from 'fs'
 
 import checkFiles from './CheckFiles.js'
 
-console.log(' 🔎 Checking For Errors')
+console.log(' 🔎 Checking Files')
 
 const hasProblems = await checkFiles(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../Boxes-Engine'))
 

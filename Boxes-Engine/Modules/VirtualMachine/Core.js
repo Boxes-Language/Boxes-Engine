@@ -16,6 +16,7 @@ export default class {
     this.TaskManager = new TaskManager(this)
     this.MemoryManager = new MemoryManager(this)
 
+    this.EnvironmentManager = new EnvironmentManager(this)
     this.ChunkManager = new ChunkManager(this)
     this.WorkspaceManager = new WorkspaceManager(this)
   }
@@ -90,6 +91,7 @@ export default class {
 
 import generateID from '../Tools/GenerateID.js'
 
+import EnvironmentManager from './Managers/EnvironmentManager.js'
 import WorkspaceManager from './Managers/WorkspaceManager.js'
 import MemoryManager from './Managers/MemoryManager.js'
 import ChunkManager from './Managers/ChunkManager.js'
