@@ -2,7 +2,6 @@ export { set, instruction_set }
 
 // Set
 function set (Core, address, data) {
-
   if (address.path.length > 0) {
     let target = Core.MemoryManager.read(address.chunkID, address.name)
 

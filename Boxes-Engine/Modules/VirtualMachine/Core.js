@@ -3,8 +3,10 @@ export default class {
   #state = 'idle'
   #options
 
+  #environment
+
   #callback
-  #result
+  #result = { error: false, data: { type: 'empty', value: 'Empty' }}
 
   #listeners = {}
 
@@ -16,7 +18,6 @@ export default class {
     this.TaskManager = new TaskManager(this)
     this.MemoryManager = new MemoryManager(this)
 
-    this.EnvironmentManager = new EnvironmentManager(this)
     this.ChunkManager = new ChunkManager(this)
     this.WorkspaceManager = new WorkspaceManager(this)
   }
@@ -27,6 +28,8 @@ export default class {
   // Start The Virtual Machine
   async start (executable, location) {
     if (this.#state === 'idle') {
+      if (this.#environment === undefined) throw new Error(`Environment Not Found (Please Set The Environment First)`)
+
       return new Promise((resolve) => {
         this.#callback = (result) => resolve(result)
 
@@ -38,14 +41,37 @@ export default class {
               const task = this.TaskManager.next()
 
               const result = this.ChunkManager.executeChunk(task)
+
+              if (result.error || result.data !== undefined) {
+                this.#result = result
+
+                if (this.#result.addCallPath !== undefined) delete this.#result.addCallPath
+              }
+
               if (result.error) {
                 this.stop()
 
                 break
-              } else if (result.data !== undefined) this.#result = result.data
+              }
             } else {
               this.stop()
           
+              break
+            }
+
+            if (this.MemoryManager.size > this.#options.maxMemory) {
+              this.#result = createError(`Reached Memory Limit (${this.MemoryManager.size} / ${this.#options.maxMemory})`, [])
+
+              this.stop()
+
+              break
+            }
+
+            if (this.ChunkManager.totalChunks > this.#options.maxChunks) {
+              this.#result = createError(`Reached Chunk Amount Limit (${this.ChunkManager.totalChunks} / ${this.#options.maxMemory})`, [])
+
+              this.stop()
+
               break
             }
           }
@@ -61,9 +87,14 @@ export default class {
   stop () {
     this.TimerManager.deleteTimer(this.timer)
 
-    this.#callback({ error: false, data: this.#result })
+    this.#callback(this.#result)
 
-    this.callEvent('stop')
+    this.callEvent('stop', this.#result)
+  }
+
+  // Set Environment
+  setEnvironment (environment) {
+    this.#environment = environment
   }
 
   // Listen To An Event
@@ -97,4 +128,4 @@ import MemoryManager from './Managers/MemoryManager.js'
 import ChunkManager from './Managers/ChunkManager.js'
 import TimerManager from './Managers/TimerManager.js'
 import TaskManager from './Managers/TaskManager.js'
-
+import { createError } from './Error.js'

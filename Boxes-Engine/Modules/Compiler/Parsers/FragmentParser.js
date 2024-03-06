@@ -18,7 +18,7 @@ export default async (Compiler, string) => {
     if (string[i] === '\n') {
       if (state.type === 'string') state.value += '\n'
       else {
-        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i-1 })
+        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i - 1 })
 
         if (layer < 1) operations.push([])
 
@@ -26,11 +26,11 @@ export default async (Compiler, string) => {
       }
     } else if (string[i] === ' ') {
       if (state.type === 'string') state.value += ' '
-      else if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i-1 })
+      else if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i - 1 })
     } else if (string[i] === '#') {
       if (state.type === 'string') state.value += ' '
       else {
-        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i-1 })
+        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i - 1 })
 
         let skip = 0
 
@@ -41,7 +41,7 @@ export default async (Compiler, string) => {
     } else if ('[{('.includes(string[i])) {
       if (state.type === 'string') state.value += string[i]
       else {
-        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i-1})
+        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i - 1})
 
         addFragment({ type: 'bracket', value: string[i], line, layer, start: i, end: i })
 
@@ -50,7 +50,7 @@ export default async (Compiler, string) => {
     } else if (']})'.includes(string[i])) {
       if (state.type === 'string') state.value += string[i]
       else {
-        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i-1})
+        if (state.type !== undefined) addFragment({ type: state.type, value: state.value, line: state.line, start: state.start, end: i - 1})
 
         layer--
 
@@ -59,35 +59,39 @@ export default async (Compiler, string) => {
     } else if (state.type === undefined) {
       const start = i
 
-      if (string.substring(i, i+3) === 'Yes' || string.substring(i, i+2) === 'No') {
-        const value = (string.substring(i, i+3) === 'Yes') ? 'Yes' : 'No'
+      if (string.substring(i, i + 3) === 'Yes' || string.substring(i, i + 2) === 'No') {
+        const value = (string.substring(i, i + 3) === 'Yes') ? 'Yes' : 'No'
 
-        addFragment({ type: 'boolean', value, line, start, end: i+(value.length-1) })
+        addFragment({ type: 'boolean', value, line, start, end: i+(value.length - 1) })
 
         return value.length
       } else if ('0123456789'.includes(string[i])) {
-        let operation = operations[operations.length-1]
+        let operation = operations[operations.length - 1]
 
         let value
 
-        if (checkFragment(operation[operation.length-1], { type: ['operator'], value: ['-'] }) && checkFragment(operation[operation.length-2], { type: ['operator'], value: expressionOperators })) {
-          operation.splice(operation.length-1, 1)
+        if (checkFragment(operation[operation.length - 1], { type: ['operator'], value: ['-'] }) && checkFragment(operation[operation.length - 2], { type: ['operator'], value: expressionOperators })) {
+          operation.splice(operation.length - 1, 1)
 
           value = `-${string[i]}`
         } else value = string[i]
 
         state = { type: 'number', value, line, start }
+      } else if (string.substring(i, i + 8) === 'Infinity') {
+        addFragment({ type: 'number', value: 'Infinity', line, start, end: i + 8 })
+
+        return 8
       } else if (string[i] === "'" || string[i] === '"') state = { type: 'string', closeType: string[i], value: '', line, start }
-      else if (string.substring(i, i+5) === 'Empty') {
-        addFragment({ type: 'empty', value: 'Empty', line, start, end: i+4 })
+      else if (string.substring(i, i + 5) === 'Empty') {
+        addFragment({ type: 'empty', value: 'Empty', line, start, end: i + 4 })
 
         return 5
-      } else if (string.substring(i, i+4) === 'Fire') {
-        addFragment({ type: 'fire', value: 'Fire', line, start, end: i+3 })
+      } else if (string.substring(i, i + 4) === 'Fire') {
+        addFragment({ type: 'fire', value: 'Fire', line, start, end: i + 3 })
 
         return 4
-      } else if (i < string.length-1 && operators.includes(string.substring(i, i+2))) {
-        addFragment({ type: 'operator', value: string.substring(i, i+2), line, start, end: i+1 })
+      } else if (i < string.length - 1 && operators.includes(string.substring(i, i + 2))) {
+        addFragment({ type: 'operator', value: string.substring(i, i + 2), line, start, end: i + 1 })
 
         return 2
       } else if (operators.includes(string[i])) {
@@ -98,19 +102,19 @@ export default async (Compiler, string) => {
       if (state.type === 'number') {
         if ('0123456789.'.includes(string[i])) state.value+=string[i]
         else {
-          if (state.value[state.value.length-1] === '.') errors.push({ content: 'Unexpected "." <operator>', line: state.line, start: state.start+(state.value.length-1) })
+          if (state.value[state.value.length - 1] === '.') errors.push({ content: 'Unexpected "." <operator>', line: state.line, start: state.start + (state.value.length - 1) })
 
           for (let i2 = 0; i2 < state.value.length; i2++) {
-            if (state.value[i2] === '.' && state.value[i2+1] === '.') errors.push({ content: 'Unexpected "." <operator>', line: state.line, start: state.start+i2 })
+            if (state.value[i2] === '.' && state.value[i2 + 1] === '.') errors.push({ content: 'Unexpected "." <operator>', line: state.line, start: state.start + i2 })
           }
 
-          addFragment({ type: 'number', value: state.value, line: state.line, start: state.start, end: i-1 })
+          addFragment({ type: 'number', value: state.value, line: state.line, start: state.start, end: i - 1 })
 
           return 0
         }
       } else if (state.type === 'string') {
-        if (string[i] === state.closeType) addFragment({ type: 'string', value: state.value, line: state.line, start: state.start, end: i-1 })
-        else state.value+=string[i]
+        if (string[i] === state.closeType) addFragment({ type: 'string', value: state.value, line: state.line, start: state.start, end: i - 1 })
+        else state.value += string[i]
       } else if (state.type === 'name') {
         if (string[i] === "'" || string[i] === '"' || operators.includes(string[i])) {
           addFragment({ type: 'name', value: state.value, line: state.line, start: state.start, end: i-- })
@@ -175,10 +179,10 @@ async function parseList (Compiler, fragments) {
 
         state = {}
       } else {
-        if (checkFragment(fragments[i], { type: ['operator'], value: [(state.type === 'actionList') ? '|' : ','], layer: state.layer+1 })) {
-          if (state.value[state.value.length-1].length > 0) state.value.push([])
+        if (checkFragment(fragments[i], { type: ['operator'], value: [(state.type === 'actionList') ? '|' : ','], layer: state.layer + 1 })) {
+          if (state.value[state.value.length - 1].length > 0) state.value.push([])
           else errors.push({ content: `Unexpected "${fragments[i].value}" <operator>`, line: fragments[i].line, start: fragments[i].start })
-        } else state.value[state.value.length-1].push(fragments[i])
+        } else state.value[state.value.length - 1].push(fragments[i])
       }
     }
 

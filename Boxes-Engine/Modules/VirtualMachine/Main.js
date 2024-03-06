@@ -53,6 +53,22 @@ export default class {
     this.#Core.stop()
   }
 
+  // Set Environment
+  setEnvironment (environment) {
+    checkParameters({
+      environment: { type: ['object'] }
+    }, { environment })
+
+    checkObject('environment', {
+      import: { type: ['boolean'] },
+      importFinder: { type: ['undefined', 'function'] },
+
+      environmentBoxes: { type: ['array'] }
+    }, environment)
+
+    this.#Core.setEnvironment(environment)
+  }
+
   // Listen To Event
   listen (name, callback) {
     checkParameters({
